@@ -1,4 +1,3 @@
-const https = require('https');
 const axios = require('axios');
 const dotenv = require('dotenv').config();
 
@@ -6,18 +5,24 @@ const buyIn = 0.00018104;
 
 // Get Price Every 5 Seconds
 setInterval(async () => {
-    axios.get('https://api.binance.com/api/v1/ticker/price?symbol=TRXETH')
-        .then((res) => {
-            console.log(`Price: ${res.data.price}`);
-            if (res.data.price >= buyIn) {
-                notifyMe(res.data.price).then((message) => {
-                    process.exit();
-                });
-            }
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+    let res = false;
+
+    try {
+        res = await axios.get('https://api.binance.com/api/v1/ticker/price?symbol=TRXETH');
+    } catch(e) {
+        console.log(e);
+    }
+
+    console.log(res.data.price);
+
+    if (res.data.price <= buyIn) {
+        try {
+            await notifyMe(res.data.price);
+            process.exit();
+        } catch (e) {
+            console.log(`ERROR: ${e}`);
+        }
+    }
 }, 5000);
 
 function notifyMe(price) {
