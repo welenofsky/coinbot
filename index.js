@@ -15,7 +15,7 @@ setInterval(async () => {
 
     console.log(res.data.price);
 
-    if (res.data.price <= buyIn) {
+    if (res.data.price >= buyIn) {
         try {
             await notifyMe(res.data.price);
             process.exit();
